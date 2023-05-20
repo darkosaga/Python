@@ -1,0 +1,150 @@
+#Design and implement a simple Music song application.
+
+#Application requirements:
+#Each music track/item must be associated with at least five data fields (e.g. track name, author, song, length, album, label) which are requested from user and saved to the list
+#The content of the input fields must be checked for blank as well as incorrect content
+#Incorrect content in the input field causes an error message and new request to be done
+#It must be possible to remove elements from the list
+#It must be possible to show the full list
+#It must be possible to show one requested item from the list
+#It must be possible to save the list to file
+#It must be possible to read the list from the file
+#The application is done by Python
+#Comments are added to the code (to make it understandable to others)
+#Variable and method names are logical and follow MOOC recommendation
+#The application uses lists or arrays
+#The application saves the data to local file system
+#The application reads the earlier saved data from local file system
+#The application will search items from application according to the requests done by the user
+#The application should include readme – file explaining what the application is doing including possible issues and the team member names
+
+
+#3.7
+import json
+
+#Lisää kappaleen listaan
+#LISÄTÄÄN ERROR VIESTI
+def add_track(track_list):
+    track = {}
+    print("Lisää kappaleen tiedot:")
+    track["track_name"] = input("Kappaleen nimi: ")
+    track["author"] = input("Esittäjä: ")
+    track["nationality"] = input("Kansallisuus: ")
+    track["length"] = input("Pituus: ")
+    track["album"] = input("Albumi: ")
+    track["label"] = input("Levy-yhtiö: ")
+    track_list.append(track)
+    print("Kappale lisätty.")
+
+def validate_track(track):
+    for field, value in track.items():
+        if not value:
+            print(f"ERROR: {field} ei voi olla tyhjä.")
+            return False
+    return True
+
+#Poista kappale listasta
+def remove_track(track_list):
+    print("Minkä rivin kappaleen haluat poistaa?")
+    index = int(input())
+    if index >= 0 and index < len(track_list):
+        track_list.pop(index)
+        print("Kappale poistettu.")
+    else:
+        print("ERROR: Kyseistä riviä ei löydy.")
+
+#Näyttää kappaleen tiedot
+def show_track(track_list, index):
+    if index >= 0 and index < len(track_list):
+        track = track_list[index]
+        print("Kappaleen tiedot:")
+        print(f"Kappaleen nimi: {track['track_name']}")
+        print(f"Esittäjä: {track['author']}")
+        print(f"Kansallisuus: {track['nationality']}")
+        print(f"Pituus: {track['length']}")
+        print(f"Albumi: {track['album']}")
+        print(f"Levy-yhtiö: {track['label']}")
+    else:
+        print("ERROR: Tietoja ei löydy.")
+
+#Näyttää kaikki kappaleet
+def show_all_tracks(track_list):
+    if not track_list:
+        print("Kappaleita ei löydy.")
+    else:
+        print("Kaikki kappaleet:")
+        for index, track in enumerate(track_list):
+            print(f"{index}: {track['track_name']} - {track['author']}")
+
+#Lisää kappaleet tiedostolle
+def save_tracks_to_file(track_list):
+    filename = input("Tallenna tiedostonimellä: ")
+    with open(filename, "w") as file:
+        json.dump(track_list, file)
+    print("Tiedosto tallennettu.")
+
+#Hakee kappalelistan tiedostolta
+def read_tracks_from_file():
+    filename = input("Anna luettavan tiedoston nimi: ")
+    try:
+        with open(filename, "r") as file:
+            track_list = json.load(file)
+            print("Kappalelista haettu.")
+            return track_list
+    except FileNotFoundError:
+        print("ERROR: Tiedostoa ei löydy.")
+        return []
+
+#Etsitään kappaletta hakusanojen avulla
+def search_tracks(track_list):
+    keyword = input("Anna hakusana: ")
+    search_results = []
+    for track in track_list:
+        if keyword.lower() in track["track_name"].lower() or keyword.lower() in track["author"].lower():
+            search_results.append(track)
+    if search_results:
+        print("Hakutulokset:")
+        for index, track in enumerate(search_results):
+            print(f"{index}: {track['track_name']} - {track['author']}")
+    else:
+        print(f"Hakusanalla {keyword} ei löydetty kappaleita.")
+
+#Päävalikko softassa
+def main():
+    track_list = []
+    while True:
+        print("\nMUSIIKKISOVELLUKSEN VALIKKO")
+        print("1. Lisää kappale")
+        print("2. Poista kappale")
+        print("3. Näytä kappale")
+        print("4. Näytä kaikki kappaleet")
+        print("5. Tallenna kappaleet tiedostoon")
+        print("6. Hae kappaleet tiedostosta")
+        print("7. Etsi kappaleita")
+        print("0. Poistu")
+
+#Valikon vaihtoehtojen valinta ja mahdollinen virheilmoitus
+        choice = input("Valitse haluamasi vaihtoehto: ")
+        if choice == "1":
+            add_track(track_list)
+        elif choice == "2":
+            remove_track(track_list)
+        elif choice == "3":
+            index = int(input("Anna haluamasi kappaleen rivi: "))
+            show_track(track_list, index)
+        elif choice == "4":
+            show_all_tracks(track_list)
+        elif choice == "5":
+            save_tracks_to_file(track_list)
+        elif choice == "6":
+            track_list = read_tracks_from_file()
+        elif choice == "7":
+            search_tracks(track_list)
+        elif choice == "0":
+            break
+        else:
+            print("ERROR: Vaihtoehtoa ei löydy. Tee uusi valinta.")
+
+#Kutsuu päävalikon funktion luettavaksi
+if __name__ == "__main__":
+    main()
